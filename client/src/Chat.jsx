@@ -15,9 +15,11 @@ export default function Chat() {
   const [messages,setMessages] = useState([]);
   const {username,id,setId,setUsername} = useContext(UserContext);
   const divUnderMessages = useRef();
+
   useEffect(() => {
     connectToWs();
   }, [selectedUserId]);
+
   function connectToWs() {
     const ws = new WebSocket('ws://localhost:4040');
     setWs(ws);
@@ -29,13 +31,18 @@ export default function Chat() {
       }, 1000);
     });
   }
+
+// fun to check how many unique clients are online
+// there can be multiple connections from one client but it will be counted as 1 people only
   function showOnlinePeople(peopleArray) {
+    //obj of unique people online :e.g {234:"suraj", 3435:"bot2"}
     const people = {};
     peopleArray.forEach(({userId,username}) => {
       people[userId] = username;
     });
     setOnlinePeople(people);
   }
+
   function handleMessage(ev) {
     const messageData = JSON.parse(ev.data);
     console.log({ev,messageData});
@@ -114,6 +121,7 @@ export default function Chat() {
     }
   }, [selectedUserId]);
 
+  //deleting self (user) from online people object, so that we don't ourself on the online side bar
   const onlinePeopleExclOurUser = {...onlinePeople};
   delete onlinePeopleExclOurUser[id];
 
@@ -159,7 +167,7 @@ export default function Chat() {
         <div className="flex-grow">
           {!selectedUserId && (
             <div className="flex h-full flex-grow items-center justify-center">
-              <div className="text-gray-300">&larr; Select a person from the sidebar</div>
+              <div className="text-black-300">&larr; Select a person from the sidebar</div>
             </div>
           )}
           {!!selectedUserId && (
